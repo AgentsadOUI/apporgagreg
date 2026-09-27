@@ -1,23 +1,26 @@
-# Réactions — Labo de révision
+# Réactions — atlas de révision
 
-PWA de révision des réactions organiques avec mode Survie et classement partagé sous pseudonyme. L'interface et les styles existants sont conservés.
+Application web statique/PWA en français pour explorer 73 réactions organiques nommées et s’entraîner.
 
-## Lancer en local
+## Modes restaurés
 
-Node.js 18+ est requis. Depuis ce dossier :
+- QCM chronométré : identifier le schéma et enchaîner les questions.
+- Memory : associer six noms et six schémas.
+- Mécanisme : associer un mécanisme global à son nom.
+- Mode survie : une erreur termine la série et met à jour le record local.
 
-```sh
+Le catalogue, les fiches, la recherche, les familles et la page de progression complètent les modes de jeu. Le QCM utilise le serveur pour tirer une partie, valider chaque réponse et publier une seule fois le résultat final au classement partagé. La survie et les autres modes conservent leur fonctionnement local.
+
+## Lancer
+
+Depuis le dossier extrait `github-agreg/`, lancer le serveur applicatif :
+
+```bash
 node server.js
 ```
 
-Ouvrir http://localhost:8787. `PORT=3000 node server.js` permet de choisir un autre port. Les scores sont enregistrés dans `leaderboard.json` (créé au premier score). Utilisez `DATA_FILE=/chemin/vers/leaderboard.json` pour un volume persistant en déploiement.
+Puis ouvrir `http://localhost:8787/` dans le navigateur. Le port peut être changé avec `PORT=9000 node server.js`. Le classement est écrit dans `leaderboard.json` (ou dans `DATA_FILE=/chemin/leaderboard.json node server.js`).
 
-## Déploiement
+Pour servir seulement l’interface sans API : `python3 -m http.server 8000`. Dans ce mode, le catalogue et les jeux locaux restent accessibles, mais le QCM vérifié et le classement partagé sont indisponibles.
 
-Déployer ce dossier sur un service Node.js qui garde un processus HTTP actif et un volume disque persistant. La commande de démarrage est `node server.js`; fournir `PORT` si la plateforme l'exige. Le serveur doit être exposé derrière HTTPS en production. Un seul fichier JSON est adapté à un petit groupe; remplacez `loadScores`/`saveScores` par une base de données transactionnelle si plusieurs instances ou un trafic réel sont nécessaires.
-
-## Validation et sécurité
-
-Le serveur tire les questions, conserve la session en mémoire, vérifie chaque réponse, calcule le score et remet un jeton de fin à usage unique. La publication exige ce jeton et le score calculé côté serveur. Les pseudonymes sont nettoyés et limités à 20 caractères; les scores sont limités aux 25 meilleurs affichés et les requêtes sont limitées par adresse IP.
-
-Il n'y a pas de compte utilisateur, d'authentification forte ni de protection anti-abus complète. Le classement est donc pseudonyme et modérable seulement en éditant le fichier de données. La mémoire de session est perdue au redémarrage; les scores persistants ne le sont pas si le volume n'est pas configuré.
+Les données référencent `assets/001_schema.png` à `assets/073_mecanisme.png`, absents des archives fournies : les emplacements de remplacement sont affichés si ces images ne sont pas disponibles.
