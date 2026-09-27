@@ -1,8 +1,23 @@
 # Réactions — Labo de révision
 
-PWA statique offline de révision des 73 réactions nommées extraites du paquet Anki. Lancer avec un serveur statique (`python3 -m http.server`), puis ouvrir l’URL dans le navigateur. Le service worker met en cache le shell et les images au premier usage; l’installation mobile dépend du navigateur et nécessite HTTPS (ou localhost).
+PWA de révision des réactions organiques avec mode Survie et classement partagé sous pseudonyme. L'interface et les styles existants sont conservés.
 
-## Données et choix technique
-Chaque objet de `data.json` contient le nom, le schéma et le mécanisme global. Les notes Anki fournissaient deux images par réaction, mais aucun découpage fiable en étapes n’était disponible dans le modèle. Le jeu 3 est donc une association mécanisme global ↔ nom, avec quatre propositions, plutôt qu’un faux réordonnancement de pixels.
+## Lancer en local
 
-Les images ont été renommées `NNN_schema.png` et `NNN_mecanisme.png`. Le score du mode Survie est stocké dans `localStorage`.
+Node.js 18+ est requis. Depuis ce dossier :
+
+```sh
+node server.js
+```
+
+Ouvrir http://localhost:8787. `PORT=3000 node server.js` permet de choisir un autre port. Les scores sont enregistrés dans `leaderboard.json` (créé au premier score). Utilisez `DATA_FILE=/chemin/vers/leaderboard.json` pour un volume persistant en déploiement.
+
+## Déploiement
+
+Déployer ce dossier sur un service Node.js qui garde un processus HTTP actif et un volume disque persistant. La commande de démarrage est `node server.js`; fournir `PORT` si la plateforme l'exige. Le serveur doit être exposé derrière HTTPS en production. Un seul fichier JSON est adapté à un petit groupe; remplacez `loadScores`/`saveScores` par une base de données transactionnelle si plusieurs instances ou un trafic réel sont nécessaires.
+
+## Validation et sécurité
+
+Le serveur tire les questions, conserve la session en mémoire, vérifie chaque réponse, calcule le score et remet un jeton de fin à usage unique. La publication exige ce jeton et le score calculé côté serveur. Les pseudonymes sont nettoyés et limités à 20 caractères; les scores sont limités aux 25 meilleurs affichés et les requêtes sont limitées par adresse IP.
+
+Il n'y a pas de compte utilisateur, d'authentification forte ni de protection anti-abus complète. Le classement est donc pseudonyme et modérable seulement en éditant le fichier de données. La mémoire de session est perdue au redémarrage; les scores persistants ne le sont pas si le volume n'est pas configuré.
